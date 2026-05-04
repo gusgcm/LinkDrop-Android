@@ -1,14 +1,22 @@
 package com.linkdrop.ui
 
+import android.content.ContentValues
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.view.*
+import android.webkit.MimeTypeMap
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.linkdrop.MainActivity
 import com.linkdrop.R
 import com.linkdrop.databinding.FragmentFilesBinding
@@ -17,6 +25,7 @@ import com.linkdrop.network.LinkDropApi
 import com.linkdrop.prefs.Prefs
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -26,6 +35,12 @@ class FilesFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var prefs: Prefs
     private lateinit var adapter: FilesAdapter
+
+    private var pendingDownload: FileItem? = null
+
+    private val saveAsLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
+        uri?.let { performDownload(pendingDownload!!, it) }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -86,6 +101,118 @@ class FilesFragment : Fragment() {
     }
 
     private fun downloadFile(item: FileItem) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(item.name)
+            .setItems(arrayOf("Save to Downloads", "Save as...", "Open (temporary)")) { _, which ->
+                when (which) {
+                    0 -> saveToDownloads(item)
+                    1 -> {
+                        pendingDownload = item
+                        saveAsLauncher.launch(item.name)
+                    }
+                    2 -> openFile(item)
+                }
+            }
+            .show()
+    }
+
+    private fun saveToDownloads(item: FileItem) {
+        val resolver = requireContext().contentResolver
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val contentValues = ContentValues().apply {
+                put(MediaStore.MediaColumns.DISPLAY_NAME, item.name)
+                val ext = item.name.substringAfterLast(".", "")
+                val mime = MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
+                put(MediaStore.MediaColumns.MIME_TYPE, mime)
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+            }
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            if (uri != null) {
+                performDownload(item, uri)
+            } else {
+                Toast.makeText(requireContext(), "Failed to create file in Downloads", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            // Pre-Q: Save directly to the Downloads directory
+            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val destFile = File(downloadsDir, item.name)
+            
+            // We need to check for permission if we were going to write directly, 
+            // but since we are using FileProvider or just wanting to "save", 
+            // let's try to use MediaStore for consistency if possible, or just File.
+            
+            binding.progressBar.visibility = View.VISIBLE
+            binding.progressBar.progress = 0
+            lifecycleScope.launch {
+                try {
+                    val api = LinkDropApi(prefs)
+                    api.downloadFile(item.name, destFile) { progress ->
+                        activity?.runOnUiThread {
+                            binding.progressBar.progress = progress
+                        }
+                    }
+                    
+                    // Trigger media scanner so it shows up in file managers
+                    val uri = Uri.fromFile(destFile)
+                    val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri)
+                    requireContext().sendBroadcast(scanIntent)
+
+                    Snackbar.make(binding.root, "Saved to Downloads", Snackbar.LENGTH_LONG)
+                        .setAction("Open") {
+                            val openUri = FileProvider.getUriForFile(
+                                requireContext(), "${requireContext().packageName}.provider", destFile)
+                            val intent = Intent(Intent.ACTION_VIEW).apply {
+                                setDataAndType(openUri, requireContext().contentResolver.getType(openUri) ?: "*/*")
+                                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                            }
+                            try { startActivity(intent) } catch (_: Exception) {}
+                        }.show()
+                } catch (e: Exception) {
+                    Toast.makeText(requireContext(), "Download failed: ${e.message}", Toast.LENGTH_LONG).show()
+                } finally {
+                    binding.progressBar.visibility = View.GONE
+                }
+            }
+        }
+    }
+
+    private fun performDownload(item: FileItem, uri: Uri) {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.progressBar.progress = 0
+        lifecycleScope.launch {
+            try {
+                val api = LinkDropApi(prefs)
+                val os = requireContext().contentResolver.openOutputStream(uri) 
+                    ?: throw Exception("Could not open output stream")
+                
+                api.downloadFile(item.name, os) { progress ->
+                    activity?.runOnUiThread {
+                        binding.progressBar.progress = progress
+                    }
+                }
+                
+                Snackbar.make(binding.root, "Saved: ${item.name}", Snackbar.LENGTH_LONG)
+                    .setAction("Open") {
+                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                            setDataAndType(uri, requireContext().contentResolver.getType(uri) ?: "*/*")
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        try {
+                            startActivity(intent)
+                        } catch (_: Exception) {
+                            Toast.makeText(requireContext(), "No app to open this file", Toast.LENGTH_SHORT).show()
+                        }
+                    }.show()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Download failed: ${e.message}", Toast.LENGTH_LONG).show()
+            } finally {
+                binding.progressBar.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun openFile(item: FileItem) {
         val cacheDir = requireContext().cacheDir
         val destFile = File(cacheDir, item.name)
 
@@ -98,9 +225,7 @@ class FilesFragment : Fragment() {
                         binding.progressBar.progress = progress
                     }
                 }
-                Toast.makeText(requireContext(), "Downloaded: ${item.name}", Toast.LENGTH_SHORT).show()
-
-                // Offer to open
+                
                 val uri = FileProvider.getUriForFile(
                     requireContext(), "${requireContext().packageName}.provider", destFile)
                 val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -109,15 +234,11 @@ class FilesFragment : Fragment() {
                 }
                 startActivity(Intent.createChooser(intent, "Open with"))
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Download failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
             } finally {
                 binding.progressBar.visibility = View.GONE
             }
         }
-    }
-
-    private fun openFile(item: FileItem) {
-        downloadFile(item)
     }
 
     private fun confirmDelete(item: FileItem) {

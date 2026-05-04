@@ -75,8 +75,8 @@ class LinkDropApi(private val prefs: Prefs) {
     }
 
     // ── Download file ─────────────────────────────────────────────────────────
-    suspend fun downloadFile(name: String, destFile: File,
-                             onProgress: (Int) -> Unit = {}): File =
+    suspend fun downloadFile(name: String, outputStream: java.io.OutputStream,
+                             onProgress: (Int) -> Unit = {}) =
         withContext(Dispatchers.IO) {
             val enc  = java.net.URLEncoder.encode(name, "UTF-8")
             val req  = baseRequest("${baseUrl()}/files/$enc").get().build()
@@ -86,7 +86,7 @@ class LinkDropApi(private val prefs: Prefs) {
             val total = body.contentLength()
             var received = 0L
             body.byteStream().use { input ->
-                destFile.outputStream().use { output ->
+                outputStream.use { output ->
                     val buf = ByteArray(8192)
                     var n: Int
                     while (input.read(buf).also { n = it } != -1) {
@@ -96,8 +96,13 @@ class LinkDropApi(private val prefs: Prefs) {
                     }
                 }
             }
-            destFile
         }
+
+    suspend fun downloadFile(name: String, destFile: File,
+                             onProgress: (Int) -> Unit = {}): File {
+        downloadFile(name, destFile.outputStream(), onProgress)
+        return destFile
+    }
 
     // ── Upload file ───────────────────────────────────────────────────────────
     suspend fun uploadFile(file: File, onProgress: (Int) -> Unit = {}) =
