@@ -36,6 +36,14 @@ class FilesFragment : Fragment() {
     private lateinit var prefs: Prefs
     private lateinit var adapter: FilesAdapter
 
+    private var lastClickTime = 0L
+    private fun isClickTooFast(): Boolean {
+        val now = System.currentTimeMillis()
+        if (now - lastClickTime < 500) return true
+        lastClickTime = now
+        return false
+    }
+
     private var pendingDownload: FileItem? = null
 
     private val saveAsLauncher = registerForActivityResult(ActivityResultContracts.CreateDocument("*/*")) { uri ->
@@ -90,8 +98,8 @@ class FilesFragment : Fragment() {
                     if (files.isEmpty()) View.VISIBLE else View.GONE
                 binding.emptyText.text = "No files in share folder"
                 binding.fileCount.text = "${files.size} file${if (files.size != 1) "s" else ""}"
-            } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            } catch (_: Exception) {
+                Toast.makeText(requireContext(), "Connection failed", Toast.LENGTH_LONG).show()
                 binding.emptyText.text = "Cannot connect to server"
                 binding.emptyText.visibility = View.VISIBLE
             } finally {
@@ -101,6 +109,7 @@ class FilesFragment : Fragment() {
     }
 
     private fun downloadFile(item: FileItem) {
+        if (isClickTooFast()) return
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(item.name)
             .setItems(arrayOf("Save to Downloads", "Save as...", "Open (temporary)")) { _, which ->
@@ -242,6 +251,7 @@ class FilesFragment : Fragment() {
     }
 
     private fun confirmDelete(item: FileItem) {
+        if (isClickTooFast()) return
         MaterialAlertDialogBuilder(requireContext())
             .setTitle("Delete file")
             .setMessage("Delete \"${item.name}\" from the server?")

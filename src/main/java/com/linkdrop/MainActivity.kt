@@ -31,6 +31,14 @@ class MainActivity : AppCompatActivity() {
     var pendingShareText: String? = null
     var pendingShareUri: Uri?     = null
 
+    private var lastClickTime = 0L
+    private fun isClickTooFast(): Boolean {
+        val now = System.currentTimeMillis()
+        if (now - lastClickTime < 500) return true
+        lastClickTime = now
+        return false
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d("LinkDrop", "MainActivity onCreate started")
@@ -136,6 +144,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun pingServer() {
+        if (isClickTooFast()) return
         val url = prefs.normalizedUrl()
         if (url.isEmpty()) {
             Toast.makeText(this, "Configura o IP primeiro!", Toast.LENGTH_SHORT).show()
@@ -146,8 +155,8 @@ class MainActivity : AppCompatActivity() {
                 val api  = LinkDropApi(prefs)
                 val info = api.ping()
                 Toast.makeText(this@MainActivity, "✅ Conectado: ${info.name}", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                Toast.makeText(this@MainActivity, "❌ Erro: ${e.message}", Toast.LENGTH_LONG).show()
+            } catch (_: Exception) {
+                Toast.makeText(this@MainActivity, "❌ Connection failed", Toast.LENGTH_LONG).show()
             }
         }
     }

@@ -16,31 +16,60 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SERVER ADDRESS"
+            android:text="SERVER IP"
             android:textColor="@color/accent"
             android:textSize="11sp"
             android:textStyle="bold"
             android:letterSpacing="0.1"
             android:layout_marginBottom="8dp" />
 
-        <com.google.android.material.textfield.TextInputLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxStrokeColor="@color/border"
-            app:hintTextColor="@color/text_dim"
-            android:hint="192.168.1.10:8765 or meuip.ddns.net:8765">
+            android:orientation="horizontal">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editUrl"
-                android:layout_width="match_parent"
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_weight="3"
                 android:layout_height="wrap_content"
-                android:textColor="@color/text_main"
-                android:textColorHint="@color/text_dim"
-                android:inputType="textUri"
-                android:fontFamily="monospace"
-                android:background="@color/bg_card" />
-        </com.google.android.material.textfield.TextInputLayout>
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxStrokeColor="@color/border"
+                app:hintTextColor="@color/text_dim"
+                android:hint="IP or Hostname (e.g. 192.168.1.10)">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editIp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_main"
+                    android:textColorHint="@color/text_dim"
+                    android:inputType="textUri"
+                    android:fontFamily="monospace"
+                    android:background="@color/bg_card" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:boxStrokeColor="@color/border"
+                app:hintTextColor="@color/text_dim"
+                android:hint="Port"
+                android:layout_marginStart="8dp">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editPort"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_main"
+                    android:textColorHint="@color/text_dim"
+                    android:inputType="number"
+                    android:text="8765"
+                    android:fontFamily="monospace"
+                    android:background="@color/bg_card" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"

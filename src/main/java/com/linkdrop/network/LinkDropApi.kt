@@ -59,8 +59,12 @@ class LinkDropApi(private val prefs: Prefs) {
 
     // ── Ping ─────────────────────────────────────────────────────────────────
     suspend fun ping(): PingResponse = withContext(Dispatchers.IO) {
-        val req  = Request.Builder().url("${baseUrl()}/ping").build()
+        val req  = baseRequest("${baseUrl()}/ping").get().build()
         val resp = client.newCall(req).execute()
+        if (!resp.isSuccessful) {
+            if (resp.code == 401 || resp.code == 403) throw Exception("Incorrect password")
+            throw Exception("HTTP ${resp.code}")
+        }
         val body = resp.body?.string() ?: throw Exception("Empty response")
         gson.fromJson(body, PingResponse::class.java)
     }

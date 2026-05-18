@@ -16,6 +16,14 @@ class SettingsFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var prefs: Prefs
 
+    private var lastClickTime = 0L
+    private fun isClickTooFast(): Boolean {
+        val now = System.currentTimeMillis()
+        if (now - lastClickTime < 500) return true
+        lastClickTime = now
+        return false
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
@@ -27,32 +35,42 @@ class SettingsFragment : Fragment() {
         prefs = Prefs(requireContext())
 
         // Load saved values
-        binding.editUrl.setText(prefs.serverUrl)
+        binding.editIp.setText(prefs.serverIp)
+        binding.editPort.setText(prefs.serverPort)
         binding.editPassword.setText(prefs.password)
         binding.switchClipboard.isChecked = prefs.autoClipboard
 
-        binding.btnSave.setOnClickListener { saveSettings() }
+        binding.btnSave.setOnClickListener { 
+            if (!isClickTooFast()) saveSettings() 
+        }
         binding.btnTest.setOnClickListener { testConnection() }
     }
 
-    private fun saveSettings() {
-        val url = binding.editUrl.text?.toString()?.trim() ?: ""
-        val pwd = binding.editPassword.text?.toString()?.trim() ?: ""
+    private fun saveSettings(showToast: Boolean = true): Boolean {
+        val ip   = binding.editIp.text?.toString()?.trim() ?: ""
+        val port = binding.editPort.text?.toString()?.trim() ?: "8765"
+        val pwd  = binding.editPassword.text?.toString()?.trim() ?: ""
 
-        if (url.isEmpty()) {
-            Toast.makeText(requireContext(), "Enter server address", Toast.LENGTH_SHORT).show()
-            return
+        if (ip.isEmpty()) {
+            Toast.makeText(requireContext(), "Enter server IP", Toast.LENGTH_SHORT).show()
+            return false
         }
 
-        prefs.serverUrl      = url
+        prefs.serverIp       = ip
+        prefs.serverPort     = port
         prefs.password       = pwd
         prefs.autoClipboard  = binding.switchClipboard.isChecked
 
-        Toast.makeText(requireContext(), "✅ Settings saved!", Toast.LENGTH_SHORT).show()
+        if (showToast) {
+            Toast.makeText(requireContext(), "✅ Settings saved!", Toast.LENGTH_SHORT).show()
+        }
+        return true
     }
 
     private fun testConnection() {
-        saveSettings()
+        if (isClickTooFast()) return
+        if (!saveSettings(showToast = false)) return
+
         binding.btnTest.isEnabled = false
         binding.statusText.text   = "Testing…"
 
@@ -61,9 +79,9 @@ class SettingsFragment : Fragment() {
                 val info = LinkDropApi(prefs).ping()
                 binding.statusText.text = "✅ Connected to \"${info.name}\"  •  v${info.version}"
                 Toast.makeText(requireContext(), "Connection successful!", Toast.LENGTH_SHORT).show()
-            } catch (e: Exception) {
-                binding.statusText.text = "❌ Failed: ${e.message}"
-                Toast.makeText(requireContext(), "Connection failed: ${e.message}", Toast.LENGTH_LONG).show()
+            } catch (_: Exception) {
+                binding.statusText.text = "❌ Connection failed"
+                Toast.makeText(requireContext(), "Connection failed. Please check IP, Port and Password.", Toast.LENGTH_LONG).show()
             } finally {
                 binding.btnTest.isEnabled = true
             }
