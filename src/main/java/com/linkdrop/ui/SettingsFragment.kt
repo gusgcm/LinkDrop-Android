@@ -5,6 +5,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.linkdrop.R
 import com.linkdrop.databinding.FragmentSettingsBinding
 import com.linkdrop.network.LinkDropApi
 import com.linkdrop.prefs.Prefs
@@ -52,7 +53,7 @@ class SettingsFragment : Fragment() {
         val pwd  = binding.editPassword.text?.toString()?.trim() ?: ""
 
         if (ip.isEmpty()) {
-            Toast.makeText(requireContext(), "Enter server IP", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.msg_enter_ip, Toast.LENGTH_SHORT).show()
             return false
         }
 
@@ -62,7 +63,7 @@ class SettingsFragment : Fragment() {
         prefs.autoClipboard  = binding.switchClipboard.isChecked
 
         if (showToast) {
-            Toast.makeText(requireContext(), "✅ Settings saved!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.msg_settings_saved, Toast.LENGTH_SHORT).show()
         }
         return true
     }
@@ -72,16 +73,16 @@ class SettingsFragment : Fragment() {
         if (!saveSettings(showToast = false)) return
 
         binding.btnTest.isEnabled = false
-        binding.statusText.text   = "Testing…"
+        binding.statusText.text   = getString(R.string.msg_testing)
 
         lifecycleScope.launch {
             try {
                 val info = LinkDropApi(prefs).ping()
-                binding.statusText.text = "✅ Connected to \"${info.name}\"  •  v${info.version}"
-                Toast.makeText(requireContext(), "Connection successful!", Toast.LENGTH_SHORT).show()
+                binding.statusText.text = getString(R.string.msg_connected_to, info.name, info.version)
+                Toast.makeText(requireContext(), R.string.msg_connection_success, Toast.LENGTH_SHORT).show()
             } catch (_: Exception) {
-                binding.statusText.text = "❌ Connection failed"
-                Toast.makeText(requireContext(), "Connection failed. Please check IP, Port and Password.", Toast.LENGTH_LONG).show()
+                binding.statusText.text = getString(R.string.msg_conn_failed_simple)
+                Toast.makeText(requireContext(), R.string.msg_connection_failed, Toast.LENGTH_LONG).show()
             } finally {
                 binding.btnTest.isEnabled = true
             }

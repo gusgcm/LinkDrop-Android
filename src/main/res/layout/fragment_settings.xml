@@ -10,13 +10,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:baselineAligned="false">
 
         <!-- Server address -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="SERVER IP"
+            android:text="@string/label_server_ip"
             android:textColor="@color/accent"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -26,7 +27,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="0dp"
@@ -35,7 +37,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxStrokeColor="@color/border"
                 app:hintTextColor="@color/text_dim"
-                android:hint="IP or Hostname (e.g. 192.168.1.10)">
+                android:hint="@string/hint_server_ip">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editIp"
@@ -55,7 +57,7 @@
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 app:boxStrokeColor="@color/border"
                 app:hintTextColor="@color/text_dim"
-                android:hint="Port"
+                android:hint="@string/label_port"
                 android:layout_marginStart="8dp">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -76,7 +78,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/text_dim"
             android:textSize="11sp"
-            android:text="Use your PC's local IP for home network, or DDNS/VPN address for remote access."
+            android:text="@string/info_ip_help"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="16dp" />
 
@@ -84,7 +86,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="PASSWORD"
+            android:text="@string/label_password"
             android:textColor="@color/accent"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -98,7 +100,7 @@
             app:boxStrokeColor="@color/border"
             app:hintTextColor="@color/text_dim"
             app:passwordToggleEnabled="true"
-            android:hint="Server password">
+            android:hint="@string/hint_password">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editPassword"
@@ -120,7 +122,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="OPTIONS"
+            android:text="@string/label_options"
             android:textColor="@color/accent"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -131,7 +133,7 @@
             android:id="@+id/switchClipboard"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Auto-sync clipboard"
+            android:text="@string/option_auto_clipboard"
             android:textColor="@color/text_main"
             app:thumbTint="@color/accent"
             app:trackTint="@color/border" />
@@ -159,7 +161,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="52dp"
-                android:text="💾  Save"
+                android:text="@string/btn_save"
                 android:textColor="@color/bg_dark"
                 android:backgroundTint="@color/accent"
                 app:cornerRadius="8dp"
@@ -170,7 +172,7 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="52dp"
-                android:text="🔌  Test Connection"
+                android:text="@string/btn_test"
                 android:textColor="@color/text_main"
                 android:backgroundTint="@color/bg_card"
                 app:strokeColor="@color/border"
@@ -189,7 +191,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="HOW TO CONNECT"
+            android:text="@string/label_how_to_connect"
             android:textColor="@color/accent"
             android:textSize="11sp"
             android:textStyle="bold"
@@ -202,7 +204,7 @@
             android:textColor="@color/text_dim"
             android:textSize="13sp"
             android:lineSpacingExtra="4dp"
-            android:text="1. Run LinkDrop on your Windows PC\n2. See the IP address shown in the app\n3. Enter it here: 192.168.x.x:8765\n4. Use same password as PC app\n5. Tap Test Connection\n\n🌍 Remote access: Open port 8765 on your router, use your public IP or DDNS address." />
+            android:text="@string/info_connect_steps" />
 
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

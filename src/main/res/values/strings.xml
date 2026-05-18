@@ -1,5 +1,77 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">LinkDrop</string>
     <string name="btn_pick_upload">⬆  Pick &amp; Upload File(s)</string>
+
+    <!-- Tabs -->
+    <string name="tab_files">Files</string>
+    <string name="tab_send">Send</string>
+    <string name="tab_clipboard">Clipboard</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Settings -->
+    <string name="label_server_ip">SERVER IP</string>
+    <string name="hint_server_ip">IP or Hostname (e.g. 192.168.1.10)</string>
+    <string name="label_port">Port</string>
+    <string name="label_password">PASSWORD</string>
+    <string name="hint_password">Server password</string>
+    <string name="info_ip_help">Use your PC\'s local IP for home network, or DDNS/VPN address for remote access.</string>
+    <string name="label_options">OPTIONS</string>
+    <string name="option_auto_clipboard">Auto-sync clipboard</string>
+    <string name="btn_save">💾  Save</string>
+    <string name="btn_test">🔌  Test Connection</string>
+    <string name="label_how_to_connect">HOW TO CONNECT</string>
+    <string name="info_connect_steps">1. Run LinkDrop on your Windows PC\n2. See the IP address shown in the app\n3. Enter it here: 192.168.x.x:8765\n4. Use same password as PC app\n5. Tap Test Connection\n\n🌍 Remote access: Open port 8765 on your router, use your public IP or DDNS address.</string>
+
+    <!-- Settings Messages -->
+    <string name="msg_enter_ip">Enter server IP</string>
+    <string name="msg_settings_saved">✅ Settings saved!</string>
+    <string name="msg_testing">Testing…</string>
+    <string name="msg_connection_success">Connection successful!</string>
+    <string name="msg_connection_failed">Connection failed. Please check IP, Port and Password.</string>
+    <string name="msg_connected_to">✅ Connected to \"%1$s\"  •  v%2$s</string>
+    <string name="msg_configure_server">Configure server address in Settings</string>
+
+    <!-- Files -->
+    <string name="label_no_files">No files in share folder</string>
+    <string name="label_file_count_single">1 file</string>
+    <string name="label_file_count_plural">%1$d files</string>
+    <string name="action_save_downloads">Save to Downloads</string>
+    <string name="action_save_as">Save as...</string>
+    <string name="action_open_temp">Open (temporary)</string>
+    <string name="msg_save_failed">Failed to create file in Downloads</string>
+    <string name="msg_output_stream_error">Could not open output stream</string>
+    <string name="msg_saved">Saved: %1$s</string>
+    <string name="msg_no_app_open">No app to open this file</string>
+    <string name="msg_download_failed">Download failed: %1$s</string>
+    <string name="dialog_delete_title">Delete file</string>
+    <string name="dialog_delete_msg">Delete \"%1$s\" from the server?</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="msg_deleted">Deleted</string>
+    <string name="msg_error">Error: %1$s</string>
+    <string name="msg_conn_failed_simple">❌ Connection failed</string>
+    <string name="msg_cannot_connect">Cannot connect to server</string>
+    <string name="action_open">Open</string>
+    <string name="action_open_with">Open with</string>
+
+    <!-- File Item -->
+    <string name="desc_download">Download</string>
+    <string name="desc_delete">Delete</string>
+    <string name="label_file">FILE</string>
+
+    <!-- Send Fragment -->
+    <string name="msg_type_something">Type something first</string>
+    <string name="msg_text_sent">✅ Text sent!</string>
+    <string name="msg_enter_notif_msg">Enter a notification message</string>
+    <string name="msg_notif_sent">✅ Notification sent to PC!</string>
+    <string name="msg_upload_success">✅ %1$d file(s) uploaded.</string>
+    <string name="msg_upload_failed">❌ %1$d failed.</string>
+
+    <!-- Clipboard -->
+    <string name="msg_clip_loaded_pc">Clipboard loaded from PC</string>
+    <string name="msg_clip_sent_pc">✅ Sent to PC clipboard!</string>
+    <string name="msg_clip_copied_phone">Copied to phone clipboard!</string>
+
+    <!-- MainActivity -->
+    <string name="msg_config_ip_first">Configure IP first!</string>
 </resources>

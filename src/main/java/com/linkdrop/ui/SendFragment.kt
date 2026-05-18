@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.linkdrop.MainActivity
+import com.linkdrop.R
 import com.linkdrop.databinding.FragmentSendBinding
 import com.linkdrop.network.LinkDropApi
 import com.linkdrop.prefs.Prefs
@@ -58,17 +59,17 @@ class SendFragment : Fragment() {
     private fun sendText() {
         val text = binding.editText.text?.toString()?.trim()
         if (text.isNullOrEmpty()) {
-            Toast.makeText(requireContext(), "Type something first", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.msg_type_something, Toast.LENGTH_SHORT).show()
             return
         }
         setLoading(true)
         lifecycleScope.launch {
             try {
                 LinkDropApi(prefs).sendText(text)
-                Toast.makeText(requireContext(), "✅ Text sent!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.msg_text_sent, Toast.LENGTH_SHORT).show()
                 binding.editText.setText("")
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "❌ Error: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), getString(R.string.msg_error, e.message), Toast.LENGTH_LONG).show()
             } finally {
                 setLoading(false)
             }
@@ -79,17 +80,17 @@ class SendFragment : Fragment() {
         val title   = binding.editNotifTitle.text?.toString()?.trim() ?: "LinkDrop"
         val message = binding.editNotifMsg.text?.toString()?.trim()
         if (message.isNullOrEmpty()) {
-            Toast.makeText(requireContext(), "Enter a notification message", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), R.string.msg_enter_notif_msg, Toast.LENGTH_SHORT).show()
             return
         }
         setLoading(true)
         lifecycleScope.launch {
             try {
                 LinkDropApi(prefs).sendNotification(title, message)
-                Toast.makeText(requireContext(), "✅ Notification sent to PC!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.msg_notif_sent, Toast.LENGTH_SHORT).show()
                 binding.editNotifMsg.setText("")
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "❌ Error: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), getString(R.string.msg_error, e.message), Toast.LENGTH_LONG).show()
             } finally {
                 setLoading(false)
             }
@@ -118,8 +119,8 @@ class SendFragment : Fragment() {
                 }
             }
             val msg = buildString {
-                if (success > 0) append("✅ $success file(s) uploaded. ")
-                if (failed  > 0) append("❌ $failed failed.")
+                if (success > 0) append(getString(R.string.msg_upload_success, success))
+                if (failed  > 0) append(getString(R.string.msg_upload_failed, failed))
             }
             Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
             binding.progressBar.visibility = View.GONE

@@ -1,0 +1,77 @@
+<resources>
+    <string name="app_name">LinkDrop</string>
+    <string name="btn_pick_upload">⬆  Escolher e Enviar Arquivo(s)</string>
+
+    <!-- Tabs -->
+    <string name="tab_files">Arquivos</string>
+    <string name="tab_send">Enviar</string>
+    <string name="tab_clipboard">Área de Transf.</string>
+    <string name="tab_settings">Configurações</string>
+
+    <!-- Settings -->
+    <string name="label_server_ip">IP DO SERVIDOR</string>
+    <string name="hint_server_ip">IP ou Hostname (ex: 192.168.1.10)</string>
+    <string name="label_port">Porta</string>
+    <string name="label_password">SENHA</string>
+    <string name="hint_password">Senha do servidor</string>
+    <string name="info_ip_help">Use o IP local do seu PC para rede doméstica, ou endereço DDNS/VPN para acesso remoto.</string>
+    <string name="label_options">OPÇÕES</string>
+    <string name="option_auto_clipboard">Auto-sincronizar área de transferência</string>
+    <string name="btn_save">💾  Salvar</string>
+    <string name="btn_test">🔌  Testar Conexão</string>
+    <string name="label_how_to_connect">COMO CONECTAR</string>
+    <string name="info_connect_steps">1. Execute o LinkDrop no seu PC Windows\n2. Veja o endereço IP mostrado no app\n3. Digite aqui: 192.168.x.x:8765\n4. Use a mesma senha do app do PC\n5. Toque em Testar Conexão\n\n🌍 Acesso remoto: Abra a porta 8765 no seu roteador, use seu IP público ou endereço DDNS.</string>
+
+    <!-- Settings Messages -->
+    <string name="msg_enter_ip">Digite o IP do servidor</string>
+    <string name="msg_settings_saved">✅ Configurações salvas!</string>
+    <string name="msg_testing">Testando…</string>
+    <string name="msg_connection_success">Conexão bem-sucedida!</string>
+    <string name="msg_connection_failed">Falha na conexão. Verifique o IP, Porta e Senha.</string>
+    <string name="msg_connected_to">✅ Conectado a \"%1$s\"  •  v%2$s</string>
+    <string name="msg_configure_server">Configure o endereço do servidor nas Configurações</string>
+
+    <!-- Files -->
+    <string name="label_no_files">Nenhum arquivo na pasta de compartilhamento</string>
+    <string name="label_file_count_single">1 arquivo</string>
+    <string name="label_file_count_plural">%1$d arquivos</string>
+    <string name="action_save_downloads">Salvar em Downloads</string>
+    <string name="action_save_as">Salvar como...</string>
+    <string name="action_open_temp">Abrir (temporário)</string>
+    <string name="msg_save_failed">Falha ao criar arquivo em Downloads</string>
+    <string name="msg_output_stream_error">Não foi possível abrir o fluxo de saída</string>
+    <string name="msg_saved">Salvo: %1$s</string>
+    <string name="msg_no_app_open">Nenhum app para abrir este arquivo</string>
+    <string name="msg_download_failed">Falha no download: %1$s</string>
+    <string name="dialog_delete_title">Excluir arquivo</string>
+    <string name="dialog_delete_msg">Excluir \"%1$s\" do servidor?</string>
+    <string name="action_delete">Excluir</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="msg_deleted">Excluído</string>
+    <string name="msg_error">Erro: %1$s</string>
+    <string name="msg_conn_failed_simple">❌ Falha na conexão</string>
+    <string name="msg_cannot_connect">Não foi possível conectar ao servidor</string>
+    <string name="action_open">Abrir</string>
+    <string name="action_open_with">Abrir com</string>
+
+    <!-- File Item -->
+    <string name="desc_download">Baixar</string>
+    <string name="desc_delete">Excluir</string>
+    <string name="label_file">ARQUIVO</string>
+
+    <!-- Send Fragment -->
+    <string name="msg_type_something">Digite algo primeiro</string>
+    <string name="msg_text_sent">✅ Texto enviado!</string>
+    <string name="msg_enter_notif_msg">Digite uma mensagem de notificação</string>
+    <string name="msg_notif_sent">✅ Notificação enviada para o PC!</string>
+    <string name="msg_upload_success">✅ %1$d arquivo(s) enviados.</string>
+    <string name="msg_upload_failed">❌ %1$d falharam.</string>
+
+    <!-- Clipboard -->
+    <string name="msg_clip_loaded_pc">Área de transferência carregada do PC</string>
+    <string name="msg_clip_sent_pc">✅ Enviado para a área de transferência do PC!</string>
+    <string name="msg_clip_copied_phone">Copiado para a área de transferência do telefone!</string>
+
+    <!-- MainActivity -->
+    <string name="msg_config_ip_first">Configure o IP primeiro!</string>
+</resources>

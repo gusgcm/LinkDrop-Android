@@ -8,6 +8,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.linkdrop.R
 import com.linkdrop.databinding.FragmentClipboardBinding
 import com.linkdrop.network.LinkDropApi
 import com.linkdrop.prefs.Prefs
@@ -40,9 +41,9 @@ class ClipboardFragment : Fragment() {
             try {
                 val text = LinkDropApi(prefs).getClipboard()
                 binding.clipText.setText(text)
-                Toast.makeText(requireContext(), "Clipboard loaded from PC", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.msg_clip_loaded_pc, Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), getString(R.string.msg_error, e.message), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -52,9 +53,9 @@ class ClipboardFragment : Fragment() {
         lifecycleScope.launch {
             try {
                 LinkDropApi(prefs).pushClipboard(text)
-                Toast.makeText(requireContext(), "✅ Sent to PC clipboard!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.msg_clip_sent_pc, Toast.LENGTH_SHORT).show()
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), getString(R.string.msg_error, e.message), Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -63,7 +64,7 @@ class ClipboardFragment : Fragment() {
         val text = binding.clipText.text?.toString() ?: return
         val cm   = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         cm.setPrimaryClip(ClipData.newPlainText("LinkDrop", text))
-        Toast.makeText(requireContext(), "Copied to phone clipboard!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), R.string.msg_clip_copied_phone, Toast.LENGTH_SHORT).show()
     }
 
     private fun loadDeviceClipboard() {

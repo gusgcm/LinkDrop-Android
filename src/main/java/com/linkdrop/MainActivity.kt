@@ -4,8 +4,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.Menu
-import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.IntentCompat
@@ -30,14 +28,6 @@ class MainActivity : AppCompatActivity() {
 
     var pendingShareText: String? = null
     var pendingShareUri: Uri?     = null
-
-    private var lastClickTime = 0L
-    private fun isClickTooFast(): Boolean {
-        val now = System.currentTimeMillis()
-        if (now - lastClickTime < 500) return true
-        lastClickTime = now
-        return false
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 try {
                     if (prefs.serverUrl.isEmpty()) {
                         binding.viewPager.setCurrentItem(3, false)
-                        Toast.makeText(this, "Configure o endereço do PC em Settings", Toast.LENGTH_LONG).show()
+                        Toast.makeText(this, R.string.msg_configure_server, Toast.LENGTH_LONG).show()
                     } else {
                         handleIncomingShare(intent)
                     }
@@ -97,7 +87,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupTabs() {
-        val titles = listOf("Files", "Send", "Clipboard", "Settings")
+        val titles = listOf(
+            getString(R.string.tab_files),
+            getString(R.string.tab_send),
+            getString(R.string.tab_clipboard),
+            getString(R.string.tab_settings)
+        )
         val icons  = listOf(
             R.drawable.ic_folder,
             R.drawable.ic_send,
@@ -128,37 +123,6 @@ class MainActivity : AppCompatActivity() {
         }.attach()
         
         binding.viewPager.offscreenPageLimit = 1
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.action_ping) {
-            pingServer()
-            return true
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun pingServer() {
-        if (isClickTooFast()) return
-        val url = prefs.normalizedUrl()
-        if (url.isEmpty()) {
-            Toast.makeText(this, "Configura o IP primeiro!", Toast.LENGTH_SHORT).show()
-            return
-        }
-        lifecycleScope.launch {
-            try {
-                val api  = LinkDropApi(prefs)
-                val info = api.ping()
-                Toast.makeText(this@MainActivity, "✅ Conectado: ${info.name}", Toast.LENGTH_SHORT).show()
-            } catch (_: Exception) {
-                Toast.makeText(this@MainActivity, "❌ Connection failed", Toast.LENGTH_LONG).show()
-            }
-        }
     }
 
     override fun onDestroy() {

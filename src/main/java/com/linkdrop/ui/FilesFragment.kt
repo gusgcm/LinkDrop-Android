@@ -82,7 +82,7 @@ class FilesFragment : Fragment() {
 
     private fun loadFiles() {
         if (prefs.serverUrl.isEmpty()) {
-            binding.emptyText.text = "Configure server address in Settings"
+            binding.emptyText.text = getString(R.string.msg_configure_server)
             binding.emptyText.visibility = View.VISIBLE
             binding.swipeRefresh.isRefreshing = false
             return
@@ -96,11 +96,15 @@ class FilesFragment : Fragment() {
                 adapter.setItems(files)
                 binding.emptyText.visibility =
                     if (files.isEmpty()) View.VISIBLE else View.GONE
-                binding.emptyText.text = "No files in share folder"
-                binding.fileCount.text = "${files.size} file${if (files.size != 1) "s" else ""}"
+                binding.emptyText.text = getString(R.string.label_no_files)
+                binding.fileCount.text = if (files.size == 1) {
+                    getString(R.string.label_file_count_single)
+                } else {
+                    getString(R.string.label_file_count_plural, files.size)
+                }
             } catch (_: Exception) {
-                Toast.makeText(requireContext(), "Connection failed", Toast.LENGTH_LONG).show()
-                binding.emptyText.text = "Cannot connect to server"
+                Toast.makeText(requireContext(), R.string.msg_conn_failed_simple, Toast.LENGTH_LONG).show()
+                binding.emptyText.text = getString(R.string.msg_cannot_connect)
                 binding.emptyText.visibility = View.VISIBLE
             } finally {
                 binding.swipeRefresh.isRefreshing = false
@@ -112,7 +116,11 @@ class FilesFragment : Fragment() {
         if (isClickTooFast()) return
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(item.name)
-            .setItems(arrayOf("Save to Downloads", "Save as...", "Open (temporary)")) { _, which ->
+            .setItems(arrayOf(
+                getString(R.string.action_save_downloads),
+                getString(R.string.action_save_as),
+                getString(R.string.action_open_temp)
+            )) { _, which ->
                 when (which) {
                     0 -> saveToDownloads(item)
                     1 -> {
@@ -140,7 +148,7 @@ class FilesFragment : Fragment() {
             if (uri != null) {
                 performDownload(item, uri)
             } else {
-                Toast.makeText(requireContext(), "Failed to create file in Downloads", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.msg_save_failed, Toast.LENGTH_SHORT).show()
             }
         } else {
             // Pre-Q: Save directly to the Downloads directory
@@ -167,8 +175,8 @@ class FilesFragment : Fragment() {
                     val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri)
                     requireContext().sendBroadcast(scanIntent)
 
-                    Snackbar.make(binding.root, "Saved to Downloads", Snackbar.LENGTH_LONG)
-                        .setAction("Open") {
+                    Snackbar.make(binding.root, R.string.action_save_downloads, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.action_open) {
                             val openUri = FileProvider.getUriForFile(
                                 requireContext(), "${requireContext().packageName}.provider", destFile)
                             val intent = Intent(Intent.ACTION_VIEW).apply {
@@ -178,7 +186,7 @@ class FilesFragment : Fragment() {
                             try { startActivity(intent) } catch (_: Exception) {}
                         }.show()
                 } catch (e: Exception) {
-                    Toast.makeText(requireContext(), "Download failed: ${e.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), getString(R.string.msg_download_failed, e.message), Toast.LENGTH_LONG).show()
                 } finally {
                     binding.progressBar.visibility = View.GONE
                 }
@@ -193,7 +201,7 @@ class FilesFragment : Fragment() {
             try {
                 val api = LinkDropApi(prefs)
                 val os = requireContext().contentResolver.openOutputStream(uri) 
-                    ?: throw Exception("Could not open output stream")
+                    ?: throw Exception(getString(R.string.msg_output_stream_error))
                 
                 api.downloadFile(item.name, os) { progress ->
                     activity?.runOnUiThread {
@@ -201,8 +209,8 @@ class FilesFragment : Fragment() {
                     }
                 }
                 
-                Snackbar.make(binding.root, "Saved: ${item.name}", Snackbar.LENGTH_LONG)
-                    .setAction("Open") {
+                Snackbar.make(binding.root, getString(R.string.msg_saved, item.name), Snackbar.LENGTH_LONG)
+                    .setAction(R.string.action_open) {
                         val intent = Intent(Intent.ACTION_VIEW).apply {
                             setDataAndType(uri, requireContext().contentResolver.getType(uri) ?: "*/*")
                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -210,11 +218,11 @@ class FilesFragment : Fragment() {
                         try {
                             startActivity(intent)
                         } catch (_: Exception) {
-                            Toast.makeText(requireContext(), "No app to open this file", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), R.string.msg_no_app_open, Toast.LENGTH_SHORT).show()
                         }
                     }.show()
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Download failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), getString(R.string.msg_download_failed, e.message), Toast.LENGTH_LONG).show()
             } finally {
                 binding.progressBar.visibility = View.GONE
             }
@@ -241,9 +249,9 @@ class FilesFragment : Fragment() {
                     setDataAndType(uri, requireContext().contentResolver.getType(uri) ?: "*/*")
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
-                startActivity(Intent.createChooser(intent, "Open with"))
+                startActivity(Intent.createChooser(intent, getString(R.string.action_open_with)))
             } catch (e: Exception) {
-                Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), getString(R.string.msg_error, e.message), Toast.LENGTH_LONG).show()
             } finally {
                 binding.progressBar.visibility = View.GONE
             }
@@ -253,20 +261,20 @@ class FilesFragment : Fragment() {
     private fun confirmDelete(item: FileItem) {
         if (isClickTooFast()) return
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("Delete file")
-            .setMessage("Delete \"${item.name}\" from the server?")
-            .setPositiveButton("Delete") { _, _ ->
+            .setTitle(R.string.dialog_delete_title)
+            .setMessage(getString(R.string.dialog_delete_msg, item.name))
+            .setPositiveButton(R.string.action_delete) { _, _ ->
                 lifecycleScope.launch {
                     try {
                         LinkDropApi(prefs).deleteFile(item.name)
-                        Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), R.string.msg_deleted, Toast.LENGTH_SHORT).show()
                         loadFiles()
                     } catch (e: Exception) {
-                        Toast.makeText(requireContext(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+                        Toast.makeText(requireContext(), getString(R.string.msg_error, e.message), Toast.LENGTH_LONG).show()
                     }
                 }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(R.string.action_cancel, null)
             .show()
     }
 
